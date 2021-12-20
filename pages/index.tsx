@@ -1,16 +1,17 @@
 import type { NextPage } from 'next'
+import { useState } from 'react'
 import styled from 'styled-components'
 
 const Container = styled.div`
   height: 100vh;
-  background-color: #c0c0c0;
+  background-color: #c0c0c0f2;
 `
 const Board = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 350px;
-  height: 400px;
+  width: 250px;
+  height: 300px;
   margin: auto;
   background: #fff;
   transform: translate(-50%, -50%);
@@ -23,45 +24,82 @@ const Face = styled.div`
   width: 30px;
   height: 30px;
   margin: auto;
-  background-color: #ff0;
+  background-color: yellow;
   border-radius: 50%;
 `
-const Filde = styled.div`
+const Field = styled.div`
   position: absolute;
-  top: 50%;
-  left: 50%;
-  display: grid;
-  width: 270px;
-  height: 270px;
+  top: 50px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 225px;
+  height: 225px;
   margin: auto;
-  background: #c0c0c0;
-  transform: translate(-50%, -50%);
+  background: #5a5a5add;
 `
-const Block = styled.div`
-  width: 30px;
-  height: 30px;
-  background-color: #fff;
-  border: solid 5px #808080;
+const Block = styled.div<{ isOpen: boolean; num: number }>`
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  font-weight: bold;
+  color: ${(props) => (props.num < 9 && props.num > 0 ? COLORS[props.num - 1] : 'block')};
+  text-align: center;
+  vertical-align: bottom;
+  background-color: ${(props) => (props.isOpen ? 'white' : 'grey')};
+  border: solid 1px yellow;
+  border-bottom: transparent;
 `
+const BombBlock = styled.div`
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  color: black;
+  text-align: center;
+  vertical-align: bottom;
+  border: solid 1px black;
+  border-bottom: transparent;
+`
+const COLORS = ['blue', 'green', 'red', 'purple', 'brown', 'yellow', 'orange', 'pink']
 
 const Home: NextPage = () => {
+  const [bombs, setBombs] = useState([{ x: 0, y: 0 }])
+  //prettier-ignoer
+  const [board, setBoard] = useState([
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+  ])
+
+  const onClick = (x: number, y: number) => {
+    console.log(x, y)
+    const newBoard: number[][] = JSON.parse(JSON.stringify(board))
+    newBoard[y][x] = bombs.some((bomb) => bomb.x === x && bomb.y === y) ? 10 : 1
+    setBoard(newBoard)
+  }
   return (
     <Container>
       <Board>
         <Face></Face>
-        <Filde>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-        </Filde>
+        <Field>
+          {board.map((row, y) =>
+            row.map((num, x) =>
+              num === 10 ? (
+                <BombBlock>●</BombBlock>
+              ) : (
+                <Block key={`${x}-${y}`} isOpen={num < 9} num={num} onClick={() => onClick(x, y)}>
+                  {num < 9 && num !== 0 && num}
+                </Block>
+              )
+            )
+          )}
+        </Field>
       </Board>
     </Container>
   )
