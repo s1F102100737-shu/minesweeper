@@ -47,7 +47,7 @@ const Block = styled.div<{ isOpen: boolean; num: number }>`
   text-align: center;
   vertical-align: bottom;
   background-color: ${(props) => (props.isOpen ? 'white' : 'grey')};
-  border: solid 1px yellow;
+  border: solid 1px Black;
   border-bottom: transparent;
 `
 const BombBlock = styled.div`
@@ -80,9 +80,17 @@ const Home: NextPage = () => {
   const onClick = (x: number, y: number) => {
     console.log(x, y)
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
-    newBoard[y][x] = bombs.some((bomb) => bomb.x === x && bomb.y === y) ? 10 : 1
+
+    for (let i = 0; i < bombs.length; i++) {
+      if (bombs[i].x === x - 1 && bombs[i].y === y) {
+        newBoard[y][x] = 1
+      } else {
+        newBoard[y][x] = 10
+      }
+    }
     setBoard(newBoard)
   }
+
   return (
     <Container>
       <Board>
